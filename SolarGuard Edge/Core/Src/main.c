@@ -120,7 +120,7 @@ int main(void)
   MX_GPIO_Init();
   MX_USB_DEVICE_Init();
   /* USER CODE BEGIN 2 */
-
+  temperature = 44.0f;
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -136,33 +136,154 @@ int main(void)
 	  	 	       	    {
 	  	 	       	    last_interval_ms = HAL_GetTick();
 
-	  	 	         sim_time += 0.1f;
+	  	 	       	    ////// Normal
 
-	  	 	      irradiance =
-	  	 	          750.0f
-	  	 	          + 230.0f * sinf(sim_time * 0.008f)
-	  	 	          + 20.0f  * sinf(sim_time * 0.035f);
+//	  	 	         sim_time += 0.1f;
+//
+//	  	 	      irradiance =
+//	  	 	          750.0f
+//	  	 	          + 230.0f * sinf(sim_time * 0.008f)
+//	  	 	          + 20.0f  * sinf(sim_time * 0.035f);
+//
+//	  	 	      ambientTemp =
+//	  	 	          27.0f
+//	  	 	          + 2.0f * sinf(sim_time * 0.004f);
+//
+//	  	 	      current =
+//	  	 	          8.5f * (irradiance / 850.0f)
+//	  	 	          + 0.03f * sinf(sim_time * 0.7f);
+//
+//	  	 	      voltage =
+//	  	 	          675.0f
+//	  	 	          + 3.0f * sinf(sim_time * 0.02f)
+//	  	 	          + 0.3f * sinf(sim_time * 0.8f);
+//
+//	  	 	      temperature =
+//	  	 	          ambientTemp
+//	  	 	          + 12.0f
+//	  	 	          + 5.0f * (irradiance / 850.0f)
+//	  	 	          + 0.1f * sinf(sim_time * 0.1f);
+//
+//	  	 	      power = voltage * current;
+	  	 	       	    //////////////////////
 
-	  	 	      ambientTemp =
-	  	 	          27.0f
-	  	 	          + 2.0f * sinf(sim_time * 0.004f);
 
-	  	 	      current =
-	  	 	          8.5f * (irradiance / 850.0f)
-	  	 	          + 0.03f * sinf(sim_time * 0.7f);
+	  	 	       	// CLOUD simulation
 
-	  	 	      voltage =
-	  	 	          675.0f
-	  	 	          + 3.0f * sinf(sim_time * 0.02f)
-	  	 	          + 0.3f * sinf(sim_time * 0.8f);
+//	  	 	       	sim_time += 0.1f;
+//
+//
+//	  	 	       	float baseIrradiance = 900.0f
+//	  	 	       	        + 20.0f * sinf(sim_time * 0.025f);
+//
+//	  	 	       	// cloud
+//	  	 	       	//  0 = not cloud
+//	  	 	       	// ~1 = full closed cloud
+//	  	 	       	float cloud = 0.5f + 0.5f * sinf(sim_time * 0.12f);
+//
+//
+//	  	 	       	cloud = cloud * cloud;
+//
+//
+//	  	 	       	irradiance =
+//	  	 	       	        baseIrradiance * (1.0f - 0.68f * cloud)
+//	  	 	       	        + 8.0f * sinf(sim_time * 0.9f);
+//
+//
+//	  	 	       	if (irradiance < 200.0f)
+//	  	 	       	    irradiance = 200.0f;
+//
+//	  	 	       	if (irradiance > 1000.0f)
+//	  	 	       	    irradiance = 1000.0f;
+//
+//
+//
+//	  	 	       	current =
+//	  	 	       	        8.5f * (irradiance / 850.0f)
+//	  	 	       	        + 0.04f * sinf(sim_time * 0.7f);
+//
+//
+//
+//	  	 	       	voltage =
+//	  	 	       	        675.0f
+//	  	 	       	        + 3.0f * sinf(sim_time * 0.025f)
+//	  	 	       	        - 4.0f * cloud
+//	  	 	       	        + 0.3f * sinf(sim_time * 0.8f);
+//
+//
+//
+//	  	 	       	ambientTemp =
+//	  	 	       	        27.0f
+//	  	 	       	        + 1.0f * sinf(sim_time * 0.005f);
+//
+//
+//
+//	  	 	       	float targetTemp =
+//	  	 	       	        ambientTemp
+//	  	 	       	        + 12.0f
+//	  	 	       	        + 5.0f * (irradiance / 850.0f);
+//
+//	  	 	       	temperature += (targetTemp - temperature) * 0.01f;
+//
+//
+//
+//	  	 	       	power = voltage * current;
+	  	 	       	    /////////////////////////////////////
 
-	  	 	      temperature =
-	  	 	          ambientTemp
-	  	 	          + 12.0f
-	  	 	          + 5.0f * (irradiance / 850.0f)
-	  	 	          + 0.1f * sinf(sim_time * 0.1f);
 
-	  	 	      power = voltage * current;
+
+	  	 	       	// ================= OVERHEAT =================
+
+	  	 	       	sim_time += 0.1f;
+
+
+	  	 	       	irradiance =
+	  	 	       	        850.0f
+	  	 	       	        + 50.0f * sinf(sim_time * 0.02f)
+	  	 	       	        + 10.0f * sinf(sim_time * 0.10f);
+
+
+	  	 	       	ambientTemp =
+	  	 	       	        27.0f
+	  	 	       	        + 1.5f * sinf(sim_time * 0.005f);
+
+
+	  	 	       	current =
+	  	 	       	        8.5f * (irradiance / 850.0f)
+	  	 	       	        + 0.03f * sinf(sim_time * 0.7f);
+
+
+	  	 	       	voltage =
+	  	 	       	        675.0f
+	  	 	       	        + 2.0f * sinf(sim_time * 0.03f)
+	  	 	       	        + 0.3f * sinf(sim_time * 0.8f);
+
+
+
+	  	 	       	float normalTemp =
+	  	 	       	        ambientTemp
+	  	 	       	        + 12.0f
+	  	 	       	        + 5.0f * (irradiance / 850.0f);
+
+
+	  	 	       	float faultHeat =
+	  	 	       	        20.0f +
+	  	 	       	        20.0f * sinf(sim_time * 0.025f);
+
+
+	  	 	       	float targetTemp = normalTemp + faultHeat;
+
+
+	  	 	       	temperature +=
+	  	 	       	        (targetTemp - temperature) * 0.015f;
+
+
+
+	  	 	       	power = voltage * current;
+
+
+
+
 	  ei_printf("%.2f,%.2f,%.2f,%.2f,%.2f,%.2f\n",voltage, current, power, temperature, ambientTemp, irradiance);
 	  	 	       	    }
   }
