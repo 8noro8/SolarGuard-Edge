@@ -26,11 +26,14 @@
 #include <string.h>
 #include <stdarg.h>
 #include "usbd_cdc_if.h"
+#include <math.h>
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
 /* USER CODE BEGIN PTD */
-
+#define FREQUENCY_HZ        10
+#define INTERVAL_MS         (1000 / (FREQUENCY_HZ + 1))
+static unsigned long last_interval_ms = 0;
 /* USER CODE END PTD */
 
 /* Private define ------------------------------------------------------------*/
@@ -58,6 +61,9 @@ static void MX_GPIO_Init(void);
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
+
+float voltage, current, power, temperature, ambientTemp, irradiance;
+
 void vprint(const char *fmt, va_list argp)
     {
     char string[200];
@@ -73,6 +79,13 @@ void ei_printf(const char *format, ...)
     vprint(format, myargs);
     va_end(myargs);
     }
+float sim_time = 0.0f;
+
+float random_float(float min, float max)
+{
+    return min + ((float)rand() / (float)RAND_MAX) * (max - min);
+}
+
 
 /* USER CODE END 0 */
 
@@ -117,6 +130,41 @@ int main(void)
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
+
+
+	  if (HAL_GetTick() > last_interval_ms + INTERVAL_MS)
+	  	 	       	    {
+	  	 	       	    last_interval_ms = HAL_GetTick();
+
+	  	 	         sim_time += 0.1f;
+
+	  	 	      irradiance =
+	  	 	          750.0f
+	  	 	          + 230.0f * sinf(sim_time * 0.008f)
+	  	 	          + 20.0f  * sinf(sim_time * 0.035f);
+
+	  	 	      ambientTemp =
+	  	 	          27.0f
+	  	 	          + 2.0f * sinf(sim_time * 0.004f);
+
+	  	 	      current =
+	  	 	          8.5f * (irradiance / 850.0f)
+	  	 	          + 0.03f * sinf(sim_time * 0.7f);
+
+	  	 	      voltage =
+	  	 	          675.0f
+	  	 	          + 3.0f * sinf(sim_time * 0.02f)
+	  	 	          + 0.3f * sinf(sim_time * 0.8f);
+
+	  	 	      temperature =
+	  	 	          ambientTemp
+	  	 	          + 12.0f
+	  	 	          + 5.0f * (irradiance / 850.0f)
+	  	 	          + 0.1f * sinf(sim_time * 0.1f);
+
+	  	 	      power = voltage * current;
+	  ei_printf("%.2f,%.2f,%.2f,%.2f,%.2f,%.2f\n",voltage, current, power, temperature, ambientTemp, irradiance);
+	  	 	       	    }
   }
   /* USER CODE END 3 */
 }

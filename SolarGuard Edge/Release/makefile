@@ -56,6 +56,12 @@ default.size.stdout \
 OBJDUMP_LIST += \
 SolarGuard\ Edge.list \
 
+OBJCOPY_HEX += \
+SolarGuard\ Edge.hex \
+
+OBJCOPY_BIN += \
+SolarGuard\ Edge.bin \
+
 
 # All Target
 all: main-build
@@ -64,8 +70,8 @@ all: main-build
 main-build: SolarGuard\ Edge.elf secondary-outputs
 
 # Tool invocations
-SolarGuard\ Edge.elf SolarGuard\ Edge.map: $(OBJS) $(USER_OBJS) G:\SolarGuard\ Edge\STM32L4Q5CGUX_FLASH.ld makefile objects.list $(OPTIONAL_TOOL_DEPS)
-	arm-none-eabi-gcc -o "SolarGuard Edge.elf" @"objects.list" $(USER_OBJS) $(LIBS) -mcpu=cortex-m4 -T"G:\SolarGuard Edge\STM32L4Q5CGUX_FLASH.ld" --specs=nosys.specs -Wl,-Map="SolarGuard Edge.map" -Wl,--gc-sections -static --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
+SolarGuard\ Edge.elf SolarGuard\ Edge.map: $(OBJS) $(USER_OBJS) C:\Users\Admin\Documents\GitHub\SolarGuard-Edge\SolarGuard\ Edge\STM32L4Q5CGUX_FLASH.ld makefile objects.list $(OPTIONAL_TOOL_DEPS)
+	arm-none-eabi-gcc -o "SolarGuard Edge.elf" @"objects.list" $(USER_OBJS) $(LIBS) -mcpu=cortex-m4 -T"C:\Users\Admin\Documents\GitHub\SolarGuard-Edge\SolarGuard Edge\STM32L4Q5CGUX_FLASH.ld" --specs=nosys.specs -Wl,-Map="SolarGuard Edge.map" -Wl,--gc-sections -static --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -u _printf_float -u _scanf_float -Wl,--start-group -lc -lm -Wl,--end-group
 	@echo 'Finished building target: $@'
 	@echo ' '
 
@@ -79,12 +85,22 @@ SolarGuard\ Edge.list: $(EXECUTABLES) makefile objects.list $(OPTIONAL_TOOL_DEPS
 	@echo 'Finished building: $@'
 	@echo ' '
 
+SolarGuard\ Edge.hex: $(EXECUTABLES) makefile objects.list $(OPTIONAL_TOOL_DEPS)
+	arm-none-eabi-objcopy  -O ihex $(EXECUTABLES) "SolarGuard Edge.hex"
+	@echo 'Finished building: $@'
+	@echo ' '
+
+SolarGuard\ Edge.bin: $(EXECUTABLES) makefile objects.list $(OPTIONAL_TOOL_DEPS)
+	arm-none-eabi-objcopy  -O binary $(EXECUTABLES) "SolarGuard Edge.bin"
+	@echo 'Finished building: $@'
+	@echo ' '
+
 # Other Targets
 clean:
-	-$(RM) SolarGuard\ Edge.elf SolarGuard\ Edge.list SolarGuard\ Edge.map SolarGuard\\ Edge.elf default.size.stdout
+	-$(RM) SolarGuard\ Edge.bin SolarGuard\ Edge.elf SolarGuard\ Edge.hex SolarGuard\ Edge.list SolarGuard\ Edge.map SolarGuard\\ Edge.elf default.size.stdout
 	-@echo ' '
 
-secondary-outputs: $(SIZE_OUTPUT) $(OBJDUMP_LIST)
+secondary-outputs: $(SIZE_OUTPUT) $(OBJDUMP_LIST) $(OBJCOPY_HEX) $(OBJCOPY_BIN)
 
 fail-specified-linker-script-missing:
 	@echo 'Error: Cannot find the specified linker script. Check the linker settings in the build configuration.'
