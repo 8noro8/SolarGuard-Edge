@@ -234,13 +234,64 @@ int main(void)
 
 	  	 	       	// ================= OVERHEAT =================
 
+//	  	 	       	sim_time += 0.1f;
+//
+//
+//	  	 	       	irradiance =
+//	  	 	       	        850.0f
+//	  	 	       	        + 50.0f * sinf(sim_time * 0.02f)
+//	  	 	       	        + 10.0f * sinf(sim_time * 0.10f);
+//
+//
+//	  	 	       	ambientTemp =
+//	  	 	       	        27.0f
+//	  	 	       	        + 1.5f * sinf(sim_time * 0.005f);
+//
+//
+//	  	 	       	current =
+//	  	 	       	        8.5f * (irradiance / 850.0f)
+//	  	 	       	        + 0.03f * sinf(sim_time * 0.7f);
+//
+//
+//	  	 	       	voltage =
+//	  	 	       	        675.0f
+//	  	 	       	        + 2.0f * sinf(sim_time * 0.03f)
+//	  	 	       	        + 0.3f * sinf(sim_time * 0.8f);
+//
+//
+//
+//	  	 	       	float normalTemp =
+//	  	 	       	        ambientTemp
+//	  	 	       	        + 12.0f
+//	  	 	       	        + 5.0f * (irradiance / 850.0f);
+//
+//
+//	  	 	       	float faultHeat =
+//	  	 	       	        20.0f +
+//	  	 	       	        20.0f * sinf(sim_time * 0.025f);
+//
+//
+//	  	 	       	float targetTemp = normalTemp + faultHeat;
+//
+//
+//	  	 	       	temperature +=
+//	  	 	       	        (targetTemp - temperature) * 0.015f;
+//
+//
+//
+//	  	 	       	power = voltage * current;
+
+	  	 	       	    /////////////////////////////
+
+	  	 	       	// ================= BAD_CONTACT =================
+
 	  	 	       	sim_time += 0.1f;
 
 
 	  	 	       	irradiance =
 	  	 	       	        850.0f
-	  	 	       	        + 50.0f * sinf(sim_time * 0.02f)
-	  	 	       	        + 10.0f * sinf(sim_time * 0.10f);
+	  	 	       	        + 45.0f * sinf(sim_time * 0.018f)
+	  	 	       	        + 8.0f  * sinf(sim_time * 0.09f);
 
 
 	  	 	       	ambientTemp =
@@ -248,34 +299,62 @@ int main(void)
 	  	 	       	        + 1.5f * sinf(sim_time * 0.005f);
 
 
+
+	  	 	       	float normalCurrent =
+	  	 	       	        8.5f * (irradiance / 850.0f);
+
+
+
+	  	 	       	float degradation =
+	  	 	       	        0.5f + 0.5f * sinf(sim_time * 0.018f);
+
+
+
 	  	 	       	current =
-	  	 	       	        8.5f * (irradiance / 850.0f)
-	  	 	       	        + 0.03f * sinf(sim_time * 0.7f);
+	  	 	       	        normalCurrent * (1.0f - 0.10f * degradation)
+	  	 	       	        + 0.03f * sinf(sim_time * 0.65f);
+
 
 
 	  	 	       	voltage =
 	  	 	       	        675.0f
-	  	 	       	        + 2.0f * sinf(sim_time * 0.03f)
-	  	 	       	        + 0.3f * sinf(sim_time * 0.8f);
+	  	 	       	        - 8.0f * degradation
+	  	 	       	        + 2.0f * sinf(sim_time * 0.025f);
 
 
 
-	  	 	       	float normalTemp =
-	  	 	       	        ambientTemp
-	  	 	       	        + 12.0f
-	  	 	       	        + 5.0f * (irradiance / 850.0f);
+
+	  	 	     float normalTemp =
+	  	 	             ambientTemp
+	  	 	             + 12.0f
+	  	 	             + 5.0f * (irradiance / 850.0f);
 
 
-	  	 	       	float faultHeat =
-	  	 	       	        20.0f +
-	  	 	       	        20.0f * sinf(sim_time * 0.025f);
+
+	  	 	     float faultHeat =
+	  	 	             6.0f
+	  	 	             + 6.0f * degradation;
+
+	  	 	     float targetTemp = normalTemp + faultHeat;
 
 
-	  	 	       	float targetTemp = normalTemp + faultHeat;
+
+	  	 	     if (targetTemp > 58.0f)
+	  	 	     {
+	  	 	         targetTemp = 58.0f;
+	  	 	     }
 
 
-	  	 	       	temperature +=
-	  	 	       	        (targetTemp - temperature) * 0.015f;
+
+	  	 	     temperature +=
+	  	 	             (targetTemp - temperature) * 0.012f;
+
+
+
+	  	 	     if (temperature > 58.0f)
+	  	 	     {
+	  	 	         temperature = 58.0f;
+	  	 	     }
 
 
 
